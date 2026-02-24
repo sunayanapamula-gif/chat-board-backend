@@ -1,11 +1,22 @@
 const express = require("express");
+const cors = require("cors");
+
 const app = express();
+const PORT = process.env.PORT || 8080;
 
-app.use(express.json()); // ✅ required to parse JSON body
+// ✅ Middleware
+app.use(cors());          // allow requests from frontend (Firebase Hosting, localhost, etc.)
+app.use(express.json());  // parse JSON body
 
+// ✅ Completion endpoint
 app.post("/completion", (req, res) => {
-  const userMessage = req.body.message;
-  res.json({ reply: "You said: " + userMessage });
+  const { message } = req.body; // ✅ match frontend App.js
+
+  // For demo, just echo back
+  res.json({ reply: `You said: ${message}` });
 });
 
-app.listen(8080, () => console.log("Server running on port 8080"));
+// ✅ Start server
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
