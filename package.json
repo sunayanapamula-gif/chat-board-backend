@@ -1,16 +1,23 @@
 {
   "name": "chat-board-backend",
   "version": "1.0.0",
-  "description": "Simple Express backend for Chat Board demo",
+  "description": "Express backend for Chat Board demo, forwards requests to Llama server",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "dev": "nodemon index.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "express",
+    "chat-board",
+    "backend",
+    "llama"
+  ],
+  "author": "Sunayana Pamula",
+  "license": "MIT",
   "dependencies": {
     "express": "^4.18.2",
-    "cors": "^2.8.5"
+    "cors": "^2.8.5",
+    "node-fetch": "^2.6.7"
   }
 }
