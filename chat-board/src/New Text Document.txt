@@ -1,0 +1,121 @@
+// src/ChatBoard.js
+import React, { useState, useEffect } from "react";
+import { db, functions } from "./firebase";
+import {
+  collection,
+  addDoc,
+  onSnapshot,
+  orderBy,
+  query,
+  serverTimestamp
+} from "firebase/firestore";
+import { httpsCallable } from "firebase/functions";
+
+export default function ChatBoard() {
+  const [message, setMessage] = useState("");
+  const [messages, setMessages] = useState([]);
+
+  // Load messages in real-time
+  useEffect(() => {
+    const q = query(collection(db, "messages"), orderBy("createdAt"));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      setMessages(snapshot.docs.map(doc => doc.data()));
+    });
+    return () => unsubscribe();
+  }, []);
+
+  // Send message + call backend
+  const sendMessage = async (e) => {
+    e.preventDefault();
+    if (!message.trim()) return;
+
+    // Save user message
+    await addDoc(collection(db, "messages"), {
+      text: message,
+      sender: "user",
+      createdAt: serverTimestamp()
+    });
+
+    try {
+      // Call Cloud Function
+      const generateReply = httpsCallable(functions, "generateReply");
+      const result = await generateReply({ text: message });
+      const reply = result.data.reply;
+
+      // Save AI reply
+      await addDoc(collection(db, "messages"), {
+        text: reply,
+        sender: "ai",
+        createdAt: serverTimestamp()
+      });
+    } catch (error) {
+      console.error("Error calling generateReply:", error);
+      await addDoc(collection(db, "messages"), {
+        text: "⚠️ Could not connect to backend.",
+        sender: "ai",
+        createdAt: serverTimestamp()
+      });
+    }
+
+    setMessage("");
+  };
+
+  return (
+    <div style={{ maxWidth: "600px", margin: "auto", padding: "20px" }}>
+      <h2 style={{ textAlign: "center" }}>Chat Board</h2>
+      <div style={{
+        border: "1px solid #ccc",
+        borderRadius: "8px",
+        padding: "10px",
+        height: "400px",
+        overflowY: "auto",
+        marginBottom: "10px",
+        backgroundColor: "#f9f9f9"
+      }}>
+        {messages.map((msg, idx) => (
+          <div key={idx} style={{
+            display: "flex",
+            justifyContent: msg.sender === "user" ? "flex-end" : "flex-start",
+            margin: "5px 0"
+          }}>
+            <div style={{
+              maxWidth: "70%",
+              padding: "10px",
+              borderRadius: "12px",
+              backgroundColor: msg.sender === "user" ? "#007bff" : "#e0e0e0",
+              color: msg.sender === "user" ? "#fff" : "#000",
+              wordWrap: "break-word"
+            }}>
+              {msg.text}
+            </div>
+          </div>
+        ))}
+      </div>
+      <form onSubmit={sendMessage} style={{ display: "flex" }}>
+        <input
+          type="text"
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          placeholder="Type a message..."
+          style={{
+            flex: 1,
+            padding: "10px",
+            borderRadius: "8px",
+            border: "1px solid #ccc",
+            marginRight: "10px"
+          }}
+        />
+        <button type="submit" style={{
+          padding: "10px 20px",
+          borderRadius: "8px",
+          border: "none",
+          backgroundColor: "#007bff",
+          color: "#fff",
+          cursor: "pointer"
+        }}>
+          Send
+        </button>
+      </form>
+    </div>
+  );
+}

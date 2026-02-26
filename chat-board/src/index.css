@@ -1,0 +1,22 @@
+/* Global reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* App-wide font and background */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #e5ddd5; /* WhatsApp-like background */
+  color: #333;
+}
+
+/* Center the app content */
+#root {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  padding: 20px;
+}
