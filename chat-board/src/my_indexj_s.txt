@@ -1,0 +1,93 @@
+const { onCall } = require("firebase-functions/v2/https");
+const fetch = (...args) =>
+  import("node-fetch").then(({ default: fetch }) => fetch(...args));
+
+let currentName = "Friend";
+
+exports.llamaChat = onCall(
+  {
+    timeoutSeconds: 540,   // ✅ max timeout (9 minutes)
+    memory: "2GiB",
+  },
+  async (request) => {
+    try {
+      let userMessage = request.data.prompt?.trim() || "Hello llama!";
+      console.log("User message:", userMessage);
+
+      // ✅ Detect if user sets a name
+      const nameMatch = userMessage.match(/(?:i am|call me)\s+(\w+)/i);
+      if (nameMatch) {
+        currentName = nameMatch[1];
+        return { reply: `Got it! I'll call you ${currentName} 🙂✨💬` };
+      }
+
+      // ✅ Detect coding prompts
+      const codingKeywords = ["python", "code", "loop", "list", "function"];
+      const isCodingTask = codingKeywords.some((kw) =>
+        userMessage.toLowerCase().includes(kw)
+      );
+
+      let formattedPrompt;
+      if (isCodingTask) {
+        formattedPrompt = `
+Always answer with Python code only.
+Wrap code inside triple backticks with the language tag (e.g. \`\`\`python).
+Do not include greetings or explanations.
+
+Task:
+${userMessage}
+Answer:
+`;
+      } else {
+        formattedPrompt = `
+You are a helpful, friendly assistant.
+Respond naturally in plain text (no code blocks).
+Always personalize with the current name: ${currentName}.
+User message: ${userMessage}
+Assistant reply:
+`;
+      }
+
+      // ✅ Use smaller n_predict for chat, larger for code
+      const nPredict = isCodingTask ? 256 : 64;
+
+      const response = await fetch("http://127.0.0.1:8080/completion", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          prompt: formattedPrompt,
+          n_predict: nPredict,
+          temperature: 0.7,
+        }),
+      });
+
+      const result = await response.json();
+      console.log("Full llama result:", JSON.stringify(result, null, 2));
+
+      let rawReply = result?.content?.trim() || "";
+
+      if (isCodingTask) {
+        // ✅ Extract ALL code blocks
+        const codeBlocks = rawReply.match(/```[\s\S]*?```/g);
+        if (codeBlocks && codeBlocks.length > 0) {
+          rawReply = codeBlocks.join("\n\n") + " 🙂✨💬";
+        } else {
+          rawReply = "```python\n# No code generated\n```";
+        }
+      } else {
+        // ✅ Plain text chat reply
+        rawReply = rawReply.replace(/```/g, "").trim();
+        if (!rawReply) {
+          rawReply = `Hello ${currentName}, how can I assist you today ❤️‍🔥`;
+        }
+      }
+
+      return { reply: rawReply };
+    } catch (error) {
+      console.error("Error generating reply:", error);
+      return {
+        reply: `Hello ${currentName}, I tried but something went wrong ⏳🙂✨💬`,
+      };
+    }
+  }
+);
