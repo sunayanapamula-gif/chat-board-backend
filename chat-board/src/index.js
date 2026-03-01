@@ -1,14 +1,39 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import App from "./App";
-import "./index.css"; // ✅ Import global styles
+import "./index.css";
+import ChatBoard from "./ChatBoard";
 
-// Create root and render App component
-const rootElement = document.getElementById("root");
-const root = ReactDOM.createRoot(rootElement);
+const backendUrl =
+  process.env.NODE_ENV === "development"
+    ? "http://localhost:5000"
+    : "https://chat-board-backend-production.up.railway.app";
 
+async function callBackend(message) {
+  try {
+    const response = await fetch(`${backendUrl}/completion`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Backend error: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    let reply = data.reply || "No reply received from backend.";
+    reply = reply.replace(/^User:.*$/gmi, "").replace(/undefined/g, "").trim();
+
+    return { reply };
+  } catch (error) {
+    console.error("Error calling backend:", error);
+    return { reply: "⚠️ I couldn’t generate a reply, but I’m here 🙂✨💬" };
+  }
+}
+
+const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-    <App />
+    <ChatBoard backendCall={callBackend} />
   </React.StrictMode>
 );

@@ -18,7 +18,9 @@ const app = initializeApp(firebaseConfig);
 
 // ✅ Export Firestore and Functions
 export const db = getFirestore(app);
-export const functions = getFunctions(app);
+
+// Explicitly set region for Functions (recommended)
+export const functions = getFunctions(app, "us-central1");
 
 // ✅ Connect to local emulator only when running locally
 if (window.location.hostname === "localhost") {
