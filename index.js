@@ -6,20 +6,73 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Health check route
+app.get("/ping", (req, res) => {
+  res.json({ status: "Backend is alive 🚀" });
+});
+
+// Chat completion route
 app.post("/completion", async (req, res) => {
   const { message } = req.body;
+
   try {
-    const llamaRes = await fetch("http://127.0.0.1:8080/completion", {
+    // 🔹 Strict system prompt
+    const systemPrompt = `You are a coding assistant.
+- If the user asks for code, respond ONLY with one complete, ready-to-paste code block inside fenced syntax (e.g. \`\`\`python ... \`\`\`).
+- Default to Python unless another language is explicitly requested.
+- Do NOT add explanations, commentary, or filler text unless the user asks for it.
+- Do NOT generate multiple code blocks. Only one fenced block per reply.
+- For non-code questions, reply politely and concisely (max 3 sentences).
+User: ${message}
+Assistant:`;
+
+    // 🔹 Call Llama.cpp server
+    const llamaRes = await fetch("http://localhost:8080/completion", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt: message, n_predict: 128 })
+      body: JSON.stringify({
+        prompt: systemPrompt,
+        n_predict: 256,
+      }),
     });
+
+    if (!llamaRes.ok) {
+      throw new Error(`Llama server error: ${llamaRes.status} ${llamaRes.statusText}`);
+    }
+
     const data = await llamaRes.json();
-    res.json({ reply: data.content });
+    let reply = data?.content?.[0]?.text || data?.content || "";
+
+    // 🔹 Cleanup: remove stray markers
+    reply = reply
+      .replace(/^User:.*$/gmi, "")
+      .replace(/^Assistant:/gmi, "")
+      .replace(/undefined/g, "")
+      .trim();
+
+    // 🔹 Enforce limits
+    const lines = reply.split("\n");
+    if (lines.length > 30) {
+      reply = lines.slice(0, 30).join("\n") + "\n... (truncated)";
+    }
+    const sentences = reply.split(/[.!?]/);
+    if (sentences.length > 3 && !reply.includes("```")) {
+      reply = sentences.slice(0, 3).join(". ") + "...";
+    }
+
+    if (!reply) {
+      reply = "⚠️ No reply generated.";
+    }
+
+    res.json({ reply });
   } catch (err) {
-    res.json({ reply: "Error connecting to Llama server." });
+    console.error("Error connecting to Llama server:", err);
+    res.status(500).json({ reply: "⚠️ Error: could not reach Llama server." });
   }
 });
 
-const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// Start backend server
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`Backend running on http://localhost:${PORT}`);
+});
