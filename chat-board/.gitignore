@@ -12,10 +12,10 @@
 /build
 
 # Firebase & Firestore
-.firebase/
-firestore-debug.log
-firestore.indexes.json
-firestore.rules
+/.firebase/
+/firestore-debug.log
+/firestore.indexes.json
+/firestore.rules
 
 # Local environment files
 .env
@@ -28,7 +28,7 @@ firestore.rules
 .DS_Store
 Thumbs.db
 .vscode/
-.idea/
+/.idea/
 
 # Logs
 npm-debug.log*
