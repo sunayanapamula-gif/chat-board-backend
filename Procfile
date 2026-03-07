@@ -1,0 +1,1 @@
+web: ./backend/bin/llama-server --port $PORT --model ./backend/models/Llama-3.2-3B-Instruct-Q4_K_M.gguf --threads 8
