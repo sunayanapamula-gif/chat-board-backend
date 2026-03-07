@@ -1,0 +1,193 @@
+.chat-board {
+  max-width: 600px;
+  margin: 40px auto;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 20px;
+  background: #fafafa;
+  font-family: "Segoe UI", sans-serif;
+}
+
+.messages {
+  max-height: 400px;
+  overflow-y: auto;
+  margin-bottom: 15px;
+}
+
+.message {
+  padding: 10px 14px;
+  margin: 8px 0;
+  border-radius: 8px;
+  line-height: 1.4;
+}
+
+.message.user {
+  background: #d1e7ff;
+  text-align: right;
+}
+
+.message.bot {
+  background: #f0f0f0;
+  text-align: left;
+}
+
+.input-area {
+  display: flex;
+  gap: 10px;
+}
+
+.input-area input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.input-area button {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  background: #0078d7;
+  color: white;
+  cursor: pointer;
+}
+
+.input-area button:hover {
+  background: #005a9e;
+}
+
+.chat-board {
+  display: flex;
+  flex-direction: column;
+  height: 100vh; /* full screen height */
+  max-width: 600px;
+  margin: 0 auto;
+  border: 1px solid #ddd;
+  background: #f9f9f9;
+  font-family: Arial, sans-serif;
+}
+
+.messages {
+  flex: 1;
+  overflow-y: auto; /* 🔹 scrollable */
+  padding: 10px;
+}
+
+.message {
+  margin: 8px 0;
+  padding: 10px 14px;
+  border-radius: 12px;
+  max-width: 80%;
+  word-wrap: break-word;
+}
+
+.message.user {
+  background: #dcf8c6; /* WhatsApp green bubble */
+  align-self: flex-end;
+}
+
+.message.bot {
+  background: #ffffff; /* white bubble */
+  border: 1px solid #ddd;
+  align-self: flex-start;
+}
+
+.message.typing {
+  font-style: italic;
+  color: #888;
+}
+
+.input-area {
+  display: flex;
+  padding: 10px;
+  border-top: 1px solid #ddd;
+  background: #fff;
+}
+
+.input-area input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  outline: none;
+}
+
+.input-area button {
+  margin-left: 10px;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 20px;
+  background: #4caf50;
+  color: white;
+  cursor: pointer;
+}
+
+.input-area button:hover {
+  background: #45a049;
+}
+
+.chat-board {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  max-width: 600px;
+  margin: auto;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.messages {
+  flex: 1;
+  padding: 10px;
+  overflow-y: auto;
+  background: #f9f9f9;
+}
+
+.message-bubble {
+  max-width: 75%;
+  padding: 10px;
+  margin: 8px;
+  border-radius: 12px;
+  word-wrap: break-word;
+}
+
+.user-bubble {
+  background: #dcf8c6;
+  align-self: flex-end;
+}
+
+.bot-bubble {
+  background: #fff;
+  border: 1px solid #ddd;
+  align-self: flex-start;
+}
+
+.typing {
+  font-style: italic;
+  opacity: 0.7;
+}
+
+.input-area {
+  display: flex;
+  padding: 10px;
+  border-top: 1px solid #ddd;
+  background: #fff;
+}
+
+.input-area input {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.input-area button {
+  margin-left: 8px;
+  padding: 8px 12px;
+  border: none;
+  background: #007bff;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+}
