@@ -27,7 +27,12 @@ User: ${message}
 Assistant:`;
 
     // 🔹 Call Llama.cpp server
-    const llamaRes = await fetch("http://localhost:8080/completion", {
+    // 👉 Locally: http://localhost:8080/completion
+    // 👉 On Railway: use the internal service name (llama-server)
+    const llamaServerUrl =
+      process.env.LLAMA_SERVER_URL || "http://llama-server:8080/completion";
+
+    const llamaRes = await fetch(llamaServerUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -43,7 +48,7 @@ Assistant:`;
     const data = await llamaRes.json();
     let reply = data?.content?.[0]?.text || data?.content || "";
 
-    // 🔹 Cleanup: remove stray markers
+    // 🔹 Cleanup
     reply = reply
       .replace(/^User:.*$/gmi, "")
       .replace(/^Assistant:/gmi, "")
@@ -71,8 +76,8 @@ Assistant:`;
   }
 });
 
-// Start backend server
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Backend running on http://localhost:${PORT}`);
+// Start backend server with Railway port + 0.0.0.0
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Backend running on port ${PORT}`);
 });
