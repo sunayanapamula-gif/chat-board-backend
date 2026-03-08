@@ -30,7 +30,7 @@ Assistant:`;
     // 👉 Locally: http://localhost:8080/completion
     // 👉 On Railway: use the internal service name (llama-server)
     const llamaServerUrl =
-      process.env.LLAMA_SERVER_URL || "http://llama-server:8080/completion";
+      process.env.LLAMA_SERVER_URL || "http://llama-deploy:8080/completion";
 
     const llamaRes = await fetch(llamaServerUrl, {
       method: "POST",
