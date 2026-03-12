@@ -2,8 +2,8 @@
 
 // Use environment variable if available, fallback to your Railway backend URL
 const API_URL =
-  process.env.REACT_APP_BACKEND_URL ||
-  "https://chat-board-backend-production-51a5.up.railway.app";
+  process.env.REACT_APP_API_BASE ||
+  "https://chat-board-backend-production.up.railway.app";
 
 /**
  * Send a message to the backend and get a completion response
@@ -30,7 +30,7 @@ export async function getCompletion(message) {
 }
 
 /**
- * Optional health check to verify backend connectivity
+ * Health check to verify backend connectivity
  * @returns {Promise<string>} - Health status message
  */
 export async function checkHealth() {
