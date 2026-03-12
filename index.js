@@ -28,9 +28,9 @@ Assistant:`;
 
     // 🔹 Call Llama.cpp server
     // 👉 Locally: http://localhost:8080/completion
-    // 👉 On Railway: use the internal service name (llama-server)
+    // 👉 On Railway: use internal service name (llama-server)
     const llamaServerUrl =
-      process.env.LLAMA_SERVER_URL || "http://llama-deploy:8080/completion";
+      process.env.LLAMA_SERVER_URL || "http://llama-server:8080/completion";
 
     const llamaRes = await fetch(llamaServerUrl, {
       method: "POST",
@@ -42,7 +42,9 @@ Assistant:`;
     });
 
     if (!llamaRes.ok) {
-      throw new Error(`Llama server error: ${llamaRes.status} ${llamaRes.statusText}`);
+      throw new Error(
+        `Llama server error: ${llamaRes.status} ${llamaRes.statusText}`
+      );
     }
 
     const data = await llamaRes.json();
@@ -76,8 +78,8 @@ Assistant:`;
   }
 });
 
-// Start backend server with Railway port + 0.0.0.0
+// Start backend server with Railway dynamic port
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(`Backend running on port ${PORT}`);
+  console.log(`✅ Server listening on port ${PORT}`);
 });
