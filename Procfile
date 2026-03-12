@@ -1,4 +1,4 @@
-web: ./bin/llama-server.exe \
+web: ./bin/llama-server \
   --model ./models/Llama-3.2-3B-Instruct-Q4_K_M.gguf \
   --threads 4 \
   --ctx-size 2048 \
