@@ -6,6 +6,11 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// ✅ Root route (fixes "Cannot GET /")
+app.get("/", (req, res) => {
+  res.send("Chat-board backend is running ✅");
+});
+
 // ✅ Health check route
 app.get("/ping", (req, res) => {
   res.json({ status: "Backend is alive 🚀" });
@@ -25,7 +30,6 @@ app.post("/completion", async (req, res) => {
 User: ${message}
 Assistant:`;
 
-    // 🔹 Call Llama.cpp server
     const llamaServerUrl =
       process.env.LLAMA_SERVER_URL || "http://llama-server:8080/completion";
 
@@ -42,14 +46,12 @@ Assistant:`;
     const data = await llamaRes.json();
     let reply = data?.content?.[0]?.text || data?.content || "";
 
-    // 🔹 Cleanup
     reply = reply
       .replace(/^User:.*$/gmi, "")
       .replace(/^Assistant:/gmi, "")
       .replace(/undefined/g, "")
       .trim();
 
-    // 🔹 Enforce limits
     const lines = reply.split("\n");
     if (lines.length > 30) {
       reply = lines.slice(0, 30).join("\n") + "\n... (truncated)";
