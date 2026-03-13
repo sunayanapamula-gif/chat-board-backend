@@ -3,7 +3,7 @@
 // Use environment variable if available, fallback to your Railway backend URL
 const API_URL =
   process.env.REACT_APP_API_BASE ||
-  "https://chat-board-backend-production.up.railway.app";
+  "https://chat-board-backend-production-2a27.up.railway.app";
 
 /**
  * Send a message to the backend and get a completion response
@@ -31,15 +31,15 @@ export async function getCompletion(message) {
 
 /**
  * Health check to verify backend connectivity
- * @returns {Promise<string>} - Health status message
+ * @returns {Promise<object>} - Health status JSON
  */
 export async function checkHealth() {
   try {
-    const response = await fetch(`${API_URL}/health`);
+    const response = await fetch(`${API_URL}/ping`);
     if (!response.ok) {
       throw new Error("Health check failed: " + response.statusText);
     }
-    return await response.text();
+    return await response.json();
   } catch (error) {
     console.error("Error checking backend health:", error);
     throw error;
