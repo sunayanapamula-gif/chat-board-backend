@@ -33,6 +33,9 @@ Assistant:`;
     const llamaServerUrl =
       process.env.LLAMA_SERVER_URL || "http://llama-server:8080/completion";
 
+    // 🔗 Log the URL being used
+    console.log("🔗 Using Llama server URL:", llamaServerUrl);
+
     const llamaRes = await fetch(llamaServerUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
