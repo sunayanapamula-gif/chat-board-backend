@@ -1,18 +1,14 @@
 import React from "react";
 import ChatBoard from "./ChatBoard";
 
-// Detect environment and set backend URL
-const backendUrl =
-  process.env.NODE_ENV === "development"
-    ? "http://localhost:5000"
-    : "https://chat-board-backend-production-2008.up.railway.app";
+const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 async function callBackend(message) {
   try {
     const response = await fetch(`${backendUrl}/completion`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message }),
+      body: JSON.stringify({ prompt: message, max_tokens: 64 }),
     });
 
     if (!response.ok) {
@@ -21,11 +17,10 @@ async function callBackend(message) {
 
     const data = await response.json();
 
-    // Clean reply text
-    let reply = data.reply || "No reply received from backend.";
+    let reply = data.content || "No reply received from backend.";
     reply = reply
-      .replace(/^User:.*$/gmi, "") // remove "User:" lines
-      .replace(/undefined/g, "")   // remove stray "undefined"
+      .replace(/^User:.*$/gmi, "")
+      .replace(/undefined/g, "")
       .trim();
 
     return { reply };
@@ -38,7 +33,6 @@ async function callBackend(message) {
 function App() {
   return (
     <div className="App">
-      {/* Pass backendCall down to ChatBoard */}
       <ChatBoard backendCall={callBackend} />
     </div>
   );
