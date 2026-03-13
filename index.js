@@ -6,17 +6,16 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Health check route
+// ✅ Health check route
 app.get("/ping", (req, res) => {
   res.json({ status: "Backend is alive 🚀" });
 });
 
-// Chat completion route
+// ✅ Chat completion route
 app.post("/completion", async (req, res) => {
   const { message } = req.body;
 
   try {
-    // 🔹 Strict system prompt
     const systemPrompt = `You are a coding assistant.
 - If the user asks for code, respond ONLY with one complete, ready-to-paste code block inside fenced syntax (e.g. \`\`\`python ... \`\`\`).
 - Default to Python unless another language is explicitly requested.
@@ -27,24 +26,17 @@ User: ${message}
 Assistant:`;
 
     // 🔹 Call Llama.cpp server
-    // 👉 Locally: http://localhost:8080/completion
-    // 👉 On Railway: use internal service name (llama-server)
     const llamaServerUrl =
       process.env.LLAMA_SERVER_URL || "http://llama-server:8080/completion";
 
     const llamaRes = await fetch(llamaServerUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        prompt: systemPrompt,
-        n_predict: 256,
-      }),
+      body: JSON.stringify({ prompt: systemPrompt, n_predict: 256 }),
     });
 
     if (!llamaRes.ok) {
-      throw new Error(
-        `Llama server error: ${llamaRes.status} ${llamaRes.statusText}`
-      );
+      throw new Error(`Llama server error: ${llamaRes.status} ${llamaRes.statusText}`);
     }
 
     const data = await llamaRes.json();
@@ -78,7 +70,7 @@ Assistant:`;
   }
 });
 
-// Start backend server with Railway dynamic port
+// ✅ Start backend server with Railway dynamic port
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`✅ Server listening on port ${PORT}`);
